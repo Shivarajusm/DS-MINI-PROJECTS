@@ -1,0 +1,142 @@
+#include < stdin.h>
+#include <stdlib.h>
+#include <string.h>
+// Define the structure for a book node
+Typedef struct Book {
+    Int ISBN;
+    Char title[100];
+    Char author[100];
+    Int quantity;
+    Struct Book* left;
+    Struct Book* right;
+} Book;
+// Function to create a new book node
+Book* createNode(int ISBN, char* title, char* author, int quantity) {
+    Book* newBook = (Book*)malloc(sizeof(Book));
+    newBook->ISBN = ISBN;
+    strcpy(newBook->title, title);
+    strcpy(newBook->author, author);
+    newBook->quantity = quantity;
+    newBook->left = newBook->right = NULL;
+    return newBook;
+}
+// Function to insert a new book into the BST
+Book* insertBook(Book* root, int ISBN, char* title, char* author, int quantity) {
+    If (root == NULL) return createNode(ISBN, title, author, quantity);
+    If (ISBN < root->ISBN)
+        Root->left = insertBook(root->left, ISBN, title, author, quantity);
+    Else if (ISBN > root->ISBN)
+        Root->right = insertBook(root->right, ISBN, title, author, quantity);
+    Return root;
+}
+// Function to search for a book by ISBN
+Book* searchBook(Book* root, int ISBN) {
+    If (root == NULL || root->ISBN == ISBN) return root;
+    If (ISBN < root->ISBN)
+        Return searchBook(root->left, ISBN);
+    Else
+        Return searchBook(root->right, ISBN);
+}
+// Function to perform in-order traversal
+Void inOrderTraversal(Book* root) {
+    If (root == NULL) return;
+    inOrderTraversal(root->left);
+    printf(“ISBN: %d, Title: %s, Author: %s, Quantity: %d\n”, root->ISBN, root->title, root->author, root->quantity);
+    inOrderTraversal(root->right);
+}
+// Function to count total books
+Int countBooks(Book* root) {
+    If (root == NULL) return 0;
+    Return 1 + countBooks(root->left) + countBooks(root->right);
+}
+// Function to find the minimum node in the BST
+Book* findMin(Book* root) {
+    While (root->left != NULL)
+        Root = root->left;
+    Return root;
+}
+// Function to delete a book by ISBN
+Book* deleteBook(Book* root, int ISBN) {
+    If (root == NULL) return root;
+    If (ISBN < root->ISBN)
+        Root->left = deleteBook(root->left, ISBN);
+    Else if (ISBN > root->ISBN)
+        Root->right = deleteBook(root->right, ISBN);
+    Else {
+        If (root->left == NULL) {
+            Book* temp = root->right;
+            Free(root);
+            Return temp;
+        } else if (root->right == NULL) {
+            Book* temp = root->left;
+            Free(root);
+            Return temp;
+        }
+        Book* temp = findMin(root->right);
+        Root->ISBN = temp->ISBN;
+        Strcpy(root->title, temp->title);
+        Strcpy(root->author, temp->author);
+        Root->quantity = temp->quantity;
+        Root->right = deleteBook(root->right, temp->ISBN);
+    }
+    Return root;
+}
+// Main function
+Int main() {
+    Book* root = NULL;
+    Int choice, ISBN, quantity;
+    Char title[100], author[100];
+    While (1) {
+        Printf(“\n--- Library Management System ---\n”);
+        Printf(“1. Add Book\n”);
+        Printf(“2. Search Book\n”);
+        Printf(“3. Delete Book\n”);
+        Printf(“4. View All Books\n”);
+        Printf(“5. Count Total Books\n”);
+        Printf(“6. Exit\n”);
+        Printf(“Enter your choice: “);
+        Scanf(“%d”, &choice);
+        Switch (choice) {
+            Case 1:
+                Printf(“Enter ISBN: “);
+                Scanf(“%d”, &ISBN);
+                Getchar(); // Clear newline
+                Printf(“Enter Title: “);
+                Gets(title);
+                Printf(“Enter Author: “);
+                Gets(author);
+                Printf(“Enter Quantity: “);
+                Scanf(“%d”, &quantity);
+                Root = insertBook(root, ISBN, title, author, quantity);
+                Break;
+            Case 2:
+                Printf(“Enter ISBN to search: “);
+                Scanf(“%d”, &ISBN);
+                Book* book = searchBook(root, ISBN);
+                If (book != NULL) {
+                    Printf(“Book Found: ISBN: %d, Title: %s, Author: %s, Quantity: %d\n”, book->ISBN, book->title, book->author, book->quantity);
+                } else {
+                    Printf(“Book not found.\n”);
+                }
+                Break;
+            Case 3:
+                Printf(“Enter ISBN to delete: “);
+                Scanf(“%d”, &ISBN);
+                Root = deleteBook(root, ISBN);
+                Printf(“Book deleted (if it existed).\n”);
+                Break;
+            Case 4:
+                Printf(“Books in the Library:\n”);
+                inOrderTraversal(root);
+                break;
+            case 5:
+                printf(“Total books: %d\n”, countBooks(root));
+                break;
+            case 6:
+                exit(0);
+            default:
+                printf(“Invalid choice. Try again.\n”);
+        }
+    }
+    Return 0;
+}
